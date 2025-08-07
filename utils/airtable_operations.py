@@ -31,19 +31,27 @@ def fetch_records_from_table(table_id):
         return []
 
 
-def upsert_records(table_id, table_name, sanitized_records):
+def upsert_records(table_id, table_name, sanitized_records, use_post=False):
     """
-    Upsert records to a given table.
+    Upsert records to a given table using POST or PATCH method.
     """
     url = f"https://api.airtable.com/v0/{AIRTABLE_BASE_ID}/{table_id}"
     payload = { "records": sanitized_records }
 
     try:
-        response = requests.patch(
-            url,
-            headers=HEADERS,
-            json=payload
-        )
+        if use_post:
+            response = requests.post(
+                url,
+                headers=HEADERS,
+                json=payload
+            )
+        else:
+            response = requests.patch(
+                url,
+                headers=HEADERS,
+                json=payload
+            )
+
         if response.status_code == 200:
             print(f"Upserted {len(sanitized_records)} records to {table_name} table successfully.")
         else:
