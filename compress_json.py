@@ -77,6 +77,26 @@ def build_compressed_json(applicant_record, experience_records, personal_records
     return compressed_json
 
 
+def sanitize_json_records(records):
+    """
+    Sanitize records for PATCH request by including only id and fields.
+    
+    Args:
+        records (list): List of records to sanitize.
+        
+    Returns:
+        list: Sanitized records with only id and fields.
+    """
+    cleaned_records = []
+    for record in records:
+        cleaned_record = {
+            "id": record["id"],
+            "fields": record["fields"]
+        }
+        cleaned_records.append(cleaned_record)
+    return cleaned_records
+
+
 def upsert_applicants_records(final_applicants_records):
     """
     Upsert applicants records to Applicants table.
@@ -89,19 +109,18 @@ def upsert_applicants_records(final_applicants_records):
     """
     url = f"https://api.airtable.com/v0/{AIRTABLE_BASE_ID}/{TABLES['applicants']}"
     payload = { "records": final_applicants_records }
-    json_payload = json.dumps(payload)
-    print(f"Payload: {json_payload}")
-    # payload_str = json.dumps(payload)
+
     try:
         response = requests.patch(
             url,
             headers=HEADERS,
-            data=json_payload
+            json=payload
         )
         if response.status_code == 200:
             print(f"Upserted to Applicants table")
         else:
             raise Exception(f"Failed to upsert to Applicants table: {response.status_code} {response.text}")
+
     except Exception as ex:
         raise Exception(f"Failed to upsert to Applicants table: {ex}")
 
@@ -144,12 +163,17 @@ def main():
     for applicant_record in applicants_records:
         applicant_compressed_json = build_compressed_json(applicant_record, experience_records, personal_records, salary_records)
         updated_applicant_record = deepcopy(applicant_record)
-        updated_applicant_record["fields"]["Compressed JSON"] = applicant_compressed_json
+        updated_applicant_record["fields"]["Compressed JSON"] = json.dumps(applicant_compressed_json)
         final_applicants_records.append(updated_applicant_record)
 
-    # print(f"Final applicants records: {final_applicants_records}")
-    # Upsert applicants records to Applicants table
-    upsert_applicants_records(final_applicants_records)
+    # Sanitize records and upsert 10 records at a time
+    sanitized_records = sanitize_json_records(final_applicants_records)
+    i = 0
+    while i < len(sanitized_records):
+        j = min(i + 10, len(sanitized_records))
+        print(f"Upserting applicants records in batch from index {i} to {j}")
+        upsert_applicants_records(sanitized_records[i:j])
+        i = j
 
 
 if __name__ == "__main__":
