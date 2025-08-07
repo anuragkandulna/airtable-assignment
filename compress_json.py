@@ -8,12 +8,6 @@ from utils.config_loader import HEADERS, AIRTABLE_BASE_ID, TABLES
 def fetch_records_from_table(table_id):
     """
     Fetch all records from a given table.
-
-    Args:
-        table_id (str): Table ID to fetch records from.
-
-    Returns:
-        list if success, empty list if error.
     """
     try:
         url = f"https://api.airtable.com/v0/{AIRTABLE_BASE_ID}/{table_id}"
@@ -29,16 +23,6 @@ def fetch_records_from_table(table_id):
 def build_compressed_json(applicant_record, experience_records, personal_records, salary_records):
     """
     Build a compressed JSON object from the records.
-
-    Args:
-        applicants_records (list): List of applicants records.
-        experience_records (list): List of experience records.
-        personal_records (list): List of personal records.
-        salary_records (list): List of salary records.
-        shortlisted_records (list): List of shortlisted records.
-
-    Returns:
-        dict: Compressed JSON object.
     """
     applicant_id = applicant_record["fields"]["Applicant ID"]
 
@@ -85,13 +69,7 @@ def build_compressed_json(applicant_record, experience_records, personal_records
 
 def sanitize_json_records(records):
     """
-    Sanitize records for PATCH request by including only id and fields.
-    
-    Args:
-        records (list): List of records to sanitize.
-        
-    Returns:
-        list: Sanitized records with only id and fields.
+    Sanitize final applicants records by including only id and fields.
     """
     cleaned_records = []
     for record in records:
@@ -106,12 +84,6 @@ def sanitize_json_records(records):
 def upsert_applicants_records(final_applicants_records):
     """
     Upsert applicants records to Applicants table.
-
-    Args:
-        final_applicants_records (list): List of applicants records with compressed JSON.
-
-    Returns:
-        None
     """
     url = f"https://api.airtable.com/v0/{AIRTABLE_BASE_ID}/{TABLES['applicants']}"
     payload = { "records": final_applicants_records }
