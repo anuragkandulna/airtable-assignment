@@ -1,6 +1,6 @@
 import json
 from utils.config_loader import TABLES   
-from airtable_operations import fetch_records_from_table, sanitize_records, upsert_records
+from utils.airtable_operations import fetch_records_from_table, sanitize_records, upsert_records
 
 
 def create_personal_details_record(applicant_id, personal_data, personal_details_record_id, applicant_record_id):
