@@ -74,11 +74,8 @@ def main():
     applicants_records = fetch_records_from_table(TABLES["applicants"])
     print(f"Found {len(applicants_records)} applicant records.")
 
-
     for i, applicant_record in enumerate(applicants_records):
         print(f"Processing applicant {i+1} of {len(applicants_records)}: {applicant_record['fields']['Applicant ID']}")
-        print(f"Applicant Record: {applicant_record}")
-        # break
 
         applicant_fields = applicant_record.get("fields", {})
         applicant_id = applicant_fields["Applicant ID"]
@@ -87,7 +84,7 @@ def main():
         work_experience_references = applicant_fields.get("Work Experience", [])
         salary_preferences_reference = applicant_fields.get("Salary Preferences", [])
 
-        # Decompress JSON
+        # Decompress JSON for the applicant
         if not compressed_json or not applicant_id:
             print(f"Skipping {applicant_id} because it doesn't have applicant ID or compressed JSON")
             continue
