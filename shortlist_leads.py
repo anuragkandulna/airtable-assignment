@@ -49,23 +49,35 @@ def verify_shortlist_criteria(applicant_id, compressed_json):
         except Exception:
             continue
 
+    # Convert currency to USD
+    currency = salary_preferences.get("currency", "")
+    if currency == "EUR":
+        rate_in_usd = salary_preferences["rate"] * 1.15
+        min_rate_in_usd = salary_preferences["min_rate"] * 1.15
+    elif currency == "GBP":
+        rate_in_usd = salary_preferences["rate"] * 1.3
+        min_rate_in_usd = salary_preferences["min_rate"] * 1.3
+    elif currency == "INR":
+        rate_in_usd = salary_preferences["rate"] * 0.012
+        min_rate_in_usd = salary_preferences["min_rate"] * 0.012
+
     # Verify if applicant meets all criteria
     meets_experience_criteria = is_from_tier1 or has_4_yoe
-    meets_compensation_criteria = int(salary_preferences.get("rate", 0)) <= 100 and int(salary_preferences.get("availability", 0)) >= 20
+    meets_compensation_criteria = int(rate_in_usd) <= 100 and int(salary_preferences.get("availability", 0)) >= 20
     meets_location_criteria = personal_details.get("location", "").lower() in {location.lower() for location in ALLOWED_LOCATIONS}
 
     if meets_experience_criteria and meets_compensation_criteria and meets_location_criteria:
         if is_from_tier1:
             score_reason = f"""
             Worked at Tier-1 company with total experience of {total_years:.1f} years. 
-            Expects compensation of {salary_preferences.get('rate', 0)} {salary_preferences.get('currency', '')} with availability of {salary_preferences.get('availability', 0)} hours per week.
+            Expects compensation of {rate_in_usd} USD with availability of {salary_preferences.get('availability', 0)} hours per week.
             Currently in {personal_details.get('location', '')}.
             """
             return True, score_reason
         else:
             score_reason = f"""
             Worked at multiple companies having total experience of {total_years:.1f} years. 
-            Expects compensation of {salary_preferences.get('rate', 0)} with availability of {salary_preferences.get('availability', 0)} hours per week. 
+            Expects compensation of {rate_in_usd} USD with availability of {salary_preferences.get('availability', 0)} hours per week. 
             Currently in {personal_details.get('location', '')}. 
             """
         return True, score_reason
