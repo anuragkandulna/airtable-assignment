@@ -38,7 +38,7 @@ def verify_shortlist_criteria(applicant_id, compressed_json):
         end = experience["end"]
         company = experience["company"]
 
-        if company.lower() in TIER_1_COMPANIES.lower():
+        if company.lower() in {company.lower() for company in TIER_1_COMPANIES}:
             is_from_tier1 = True
 
         try:
@@ -52,13 +52,13 @@ def verify_shortlist_criteria(applicant_id, compressed_json):
     # Verify if applicant meets all criteria
     meets_experience_criteria = is_from_tier1 or has_4_yoe
     meets_compensation_criteria = int(salary_preferences.get("rate", 0)) <= 100 and int(salary_preferences.get("availability", 0)) >= 20
-    meets_location_criteria = personal_details.get("location", "").lower() in ALLOWED_LOCATIONS.lower()
+    meets_location_criteria = personal_details.get("location", "").lower() in {location.lower() for location in ALLOWED_LOCATIONS}
 
     if meets_experience_criteria and meets_compensation_criteria and meets_location_criteria:
         if is_from_tier1:
             score_reason = f"""
             Worked at Tier-1 company with total experience of {total_years:.1f} years. 
-            Expects compensation of {salary_preferences.get('rate', 0)} with availability of {salary_preferences.get('availability', 0)} hours per week.
+            Expects compensation of {salary_preferences.get('rate', 0)} {salary_preferences.get('currency', '')} with availability of {salary_preferences.get('availability', 0)} hours per week.
             Currently in {personal_details.get('location', '')}.
             """
             return True, score_reason
@@ -155,7 +155,8 @@ def main():
         upsert_records(
             table_id=TABLES["shortlisted"],
             table_name="Shortlisted Leads",
-            sanitized_records=final_shortlisted_leads[i:j]
+            sanitized_records=final_shortlisted_leads[i:j],
+            use_post=True
         )
         i = j
 
@@ -168,7 +169,8 @@ def main():
         upsert_records(
             table_id=TABLES["applicants"],
             table_name="Applicants",
-            sanitized_records=sanitized_applicants_records[i:j]
+            sanitized_records=sanitized_applicants_records[i:j],
+            use_post=False
         )
         i = j
 
