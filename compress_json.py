@@ -2,7 +2,7 @@ import json
 import os
 from copy import deepcopy
 from utils.config_loader import TABLES   
-from airtable_operations import fetch_records_from_table, sanitize_records, upsert_records
+from utils.airtable_operations import fetch_records_from_table, sanitize_records, upsert_records
 
 
 def build_compressed_json(applicant_record, experience_records, personal_records, salary_records):
