@@ -132,10 +132,10 @@ def main():
         )
         final_applicants_records.append(updated_applicant_record)
 
-    # Save final applicants records to a file
-    with open("data/llm_updated_applicants_records.json", "w") as f:
-        json.dump(final_applicants_records, f, indent=4)
-        print(f"Saved {len(final_applicants_records)} final applicants records to data/llm_updated_applicants_records.json")
+    # # Save final applicants records to a file
+    # with open("data/llm_updated_applicants_records.json", "w") as f:
+    #     json.dump(final_applicants_records, f, indent=4)
+    #     print(f"Saved {len(final_applicants_records)} final applicants records to data/llm_updated_applicants_records.json")
 
     # Upsert final applicants records
     sanitized_final_applicants_records = sanitize_records(final_applicants_records)
