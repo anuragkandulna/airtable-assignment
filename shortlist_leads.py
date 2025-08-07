@@ -174,7 +174,7 @@ def main():
         )
         i = j
 
-    print("Shortlist leads and update applicants records completed successfully.")
+    print("Shortlist leads and update applicants records completed successfully!!!")
 
 
 if __name__ == "__main__":
