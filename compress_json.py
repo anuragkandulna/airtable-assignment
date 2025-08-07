@@ -1,0 +1,156 @@
+import requests
+import json
+import os
+from copy import deepcopy
+from utils.config_loader import HEADERS, AIRTABLE_BASE_ID, TABLES   
+
+
+def fetch_records_from_table(table_id):
+    """
+    Fetch all records from a given table.
+
+    Args:
+        table_id (str): Table ID to fetch records from.
+
+    Returns:
+        list if success, empty list if error.
+    """
+    try:
+        url = f"https://api.airtable.com/v0/{AIRTABLE_BASE_ID}/{table_id}"
+        response = requests.get(url, headers=HEADERS)
+        data = response.json()
+        return data.get("records", [])
+
+    except Exception as ex:
+        print(f"Error fetching records from {table_id}: {ex}")
+        return []
+
+
+def build_compressed_json(applicant_record, experience_records, personal_records, salary_records):
+    """
+    Build a compressed JSON object from the records.
+
+    Args:
+        applicants_records (list): List of applicants records.
+        experience_records (list): List of experience records.
+        personal_records (list): List of personal records.
+        salary_records (list): List of salary records.
+        shortlisted_records (list): List of shortlisted records.
+
+    Returns:
+        dict: Compressed JSON object.
+    """
+    applicant_id = applicant_record["fields"]["Applicant ID"]
+
+    personal_data = {}
+    for personal_record in personal_records:
+        if personal_record.get("fields", {}).get("Applicant") is not None and applicant_id == personal_record["fields"]["Applicant ID"]:
+            personal_data = {
+                "name": personal_record["fields"]["Full Name"],
+                "location": personal_record["fields"]["Location"]
+            }
+            break
+
+    experience_data = []
+    for experience_record in experience_records:
+        if experience_record.get("fields", {}).get("Applicant") is not None and applicant_id == experience_record["fields"]["Applicant ID"]:
+            experience_data.append({
+                "company": experience_record["fields"]["Company"],
+                "title": experience_record["fields"]["Title"],
+            })
+    
+    salary_data = {}
+    for salary_record in salary_records:
+        if salary_record.get("fields", {}).get("Applicant") is not None and applicant_id == salary_record["fields"]["Applicant ID"]:
+            salary_data = {
+                "rate": salary_record["fields"]["Preferred Rate"],
+                "currency": salary_record["fields"]["Currency"],
+                "availability": int(salary_record["fields"]["Availability (hrs/wk)"]),
+            }
+            break
+
+    compressed_json = {
+        "personal": personal_data,
+        "experience": experience_data,
+        "salary": salary_data,
+    }
+    return compressed_json
+
+
+def upsert_applicants_records(final_applicants_records):
+    """
+    Upsert applicants records to Applicants table.
+
+    Args:
+        final_applicants_records (list): List of applicants records with compressed JSON.
+
+    Returns:
+        None
+    """
+    url = f"https://api.airtable.com/v0/{AIRTABLE_BASE_ID}/{TABLES['applicants']}"
+    payload = { "records": final_applicants_records }
+    json_payload = json.dumps(payload)
+    print(f"Payload: {json_payload}")
+    # payload_str = json.dumps(payload)
+    try:
+        response = requests.patch(
+            url,
+            headers=HEADERS,
+            data=json_payload
+        )
+        if response.status_code == 200:
+            print(f"Upserted to Applicants table")
+        else:
+            raise Exception(f"Failed to upsert to Applicants table: {response.status_code} {response.text}")
+    except Exception as ex:
+        raise Exception(f"Failed to upsert to Applicants table: {ex}")
+
+
+def main():
+    """
+    Main function to fetch all records from all tables.
+    """
+    applicants_records = fetch_records_from_table(TABLES["applicants"])
+    experience_records = fetch_records_from_table(TABLES["experience"])
+    personal_records = fetch_records_from_table(TABLES["personal"])
+    salary_records = fetch_records_from_table(TABLES["salary"])
+
+    print(f"Fetched {len(applicants_records)} applicants records")
+    print(f"Fetched {len(experience_records)} experience records")
+    print(f"Fetched {len(personal_records)} personal records")
+    print(f"Fetched {len(salary_records)} salary records")
+
+    # Save records to JSON files
+    os.makedirs("data", exist_ok=True)
+
+    with open("data/applicants.json", "w") as f:
+        json.dump(applicants_records, f, indent=4)
+        print(f"Saved {len(applicants_records)} applicants records to data/applicants.json")
+
+    with open("data/experience.json", "w") as f:
+        json.dump(experience_records, f, indent=4)
+        print(f"Saved {len(experience_records)} experience records to data/experience.json")
+
+    with open("data/personal.json", "w") as f:
+        json.dump(personal_records, f, indent=4)
+        print(f"Saved {len(personal_records)} personal records to data/personal.json")
+
+    with open("data/salary.json", "w") as f:
+        json.dump(salary_records, f, indent=4)
+        print(f"Saved {len(salary_records)} salary records to data/salary.json")
+
+    # Build compressed JSON for entire applicants records
+    final_applicants_records = []
+    for applicant_record in applicants_records:
+        applicant_compressed_json = build_compressed_json(applicant_record, experience_records, personal_records, salary_records)
+        updated_applicant_record = deepcopy(applicant_record)
+        updated_applicant_record["fields"]["Compressed JSON"] = applicant_compressed_json
+        final_applicants_records.append(updated_applicant_record)
+
+    # print(f"Final applicants records: {final_applicants_records}")
+    # Upsert applicants records to Applicants table
+    upsert_applicants_records(final_applicants_records)
+
+
+if __name__ == "__main__":
+    main()
