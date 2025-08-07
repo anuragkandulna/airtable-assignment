@@ -1,23 +1,8 @@
-import requests
 import json
 import os
 from copy import deepcopy
-from utils.config_loader import HEADERS, AIRTABLE_BASE_ID, TABLES   
-
-
-def fetch_records_from_table(table_id):
-    """
-    Fetch all records from a given table.
-    """
-    try:
-        url = f"https://api.airtable.com/v0/{AIRTABLE_BASE_ID}/{table_id}"
-        response = requests.get(url, headers=HEADERS)
-        data = response.json()
-        return data.get("records", [])
-
-    except Exception as ex:
-        print(f"Error fetching records from {table_id}: {ex}")
-        return []
+from utils.config_loader import TABLES   
+from airtable_operations import fetch_records_from_table, sanitize_records, upsert_records
 
 
 def build_compressed_json(applicant_record, experience_records, personal_records, salary_records):
@@ -67,42 +52,6 @@ def build_compressed_json(applicant_record, experience_records, personal_records
     return compressed_json
 
 
-def sanitize_json_records(records):
-    """
-    Sanitize final applicants records by including only id and fields.
-    """
-    cleaned_records = []
-    for record in records:
-        cleaned_record = {
-            "id": record["id"],
-            "fields": record["fields"]
-        }
-        cleaned_records.append(cleaned_record)
-    return cleaned_records
-
-
-def upsert_applicants_records(final_applicants_records):
-    """
-    Upsert applicants records to Applicants table.
-    """
-    url = f"https://api.airtable.com/v0/{AIRTABLE_BASE_ID}/{TABLES['applicants']}"
-    payload = { "records": final_applicants_records }
-
-    try:
-        response = requests.patch(
-            url,
-            headers=HEADERS,
-            json=payload
-        )
-        if response.status_code == 200:
-            print(f"Upserted to Applicants table")
-        else:
-            raise Exception(f"Failed to upsert to Applicants table: {response.status_code} {response.text}")
-
-    except Exception as ex:
-        raise Exception(f"Failed to upsert to Applicants table: {ex}")
-
-
 def main():
     """
     Main function to fetch all records from all tables.
@@ -149,12 +98,16 @@ def main():
         print(f"Saved {len(final_applicants_records)} final applicants records to data/final_applicants_records.json")
 
     # Sanitize records and upsert 10 records at a time
-    sanitized_records = sanitize_json_records(final_applicants_records)
+    sanitized_records = sanitize_records(final_applicants_records)
     i = 0
     while i < len(sanitized_records):
         j = min(i + 10, len(sanitized_records))
-        print(f"Upserting applicants records in batch from index {i} to {j}")
-        upsert_applicants_records(sanitized_records[i:j])
+        print(f"Upserting {len(sanitized_records[i:j])} records in batch from index {i} to {j}")
+        upsert_records(
+            table_id=TABLES["applicants"],
+            table_name="Applicants",
+            sanitized_records=sanitized_records[i:j]
+        )
         i = j
 
 
