@@ -1,11 +1,11 @@
 import json
-import openai
+from openai import OpenAI
 import time
 from utils.config_loader import TABLES, OPENAI_API_KEY
 from utils.airtable_operations import fetch_records_from_table, sanitize_records, upsert_records
 
 
-openai.api_key = OPENAI_API_KEY
+client = OpenAI(api_key=OPENAI_API_KEY)
 
 
 def build_validation_prompt(compressed_json):
@@ -36,7 +36,7 @@ def call_openai_api(prompt, retries=3):
     """
     for i in range(retries):
         try:
-            response = openai.ChatCompletion.create(
+            response = client.chat.completions.create(
                 model="gpt-4o-mini",
                 messages=[{"role": "user", "content": prompt}],
                 max_tokens=1000,
@@ -77,10 +77,8 @@ def create_updated_applicant_record(applicant_id, llm_result, applicant_record_i
     Create an updated applicant record.
     """
     updated_applicant_record = {
+        "id": applicant_record_id,
         "fields": {
-            "Applicant": [
-                applicant_record_id
-            ],
             "Applicant ID": applicant_id,
             "LLM Summary": llm_result["LLM Summary"],
             "LLM Score": llm_result["LLM Score"],
@@ -110,7 +108,7 @@ def main():
             print(f"Skipping {applicant_id} because it doesn't have applicant ID or compressed JSON")
             continue
 
-        if shortlist_status not in ["Waiting", "Invalid"]:
+        if shortlist_status in ["Waiting", "Invalid"]:
             print(f"Skipping {applicant_id} because it's already processed. Shortlist Status: {shortlist_status}")
             continue
 
@@ -140,15 +138,16 @@ def main():
         print(f"Saved {len(final_applicants_records)} final applicants records to data/llm_updated_applicants_records.json")
 
     # Upsert final applicants records
-    sanitized_applicants_records = sanitize_records(final_applicants_records)
+    sanitized_final_applicants_records = sanitize_records(final_applicants_records)
     i = 0
-    while i < len(sanitized_applicants_records):
-        j = min(i + 10, len(sanitized_applicants_records))
-        print(f"Upserting {len(sanitized_applicants_records[i:j])} applicants records in batch from index {i} to {j}")
+    while i < len(sanitized_final_applicants_records):
+        j = min(i + 10, len(sanitized_final_applicants_records))
+        print(f"Creating {len(sanitized_final_applicants_records[i:j])} new applicants records in batch from index {i} to {j}")
         upsert_records(
             table_id=TABLES["applicants"],
             table_name="Applicants",
-            sanitized_records=sanitized_applicants_records[i:j]
+            sanitized_records=sanitized_final_applicants_records[i:j],
+            use_post=False
         )
         i = j
 
