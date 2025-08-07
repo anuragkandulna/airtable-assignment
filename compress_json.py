@@ -47,7 +47,9 @@ def build_compressed_json(applicant_record, experience_records, personal_records
         if personal_record.get("fields", {}).get("Applicant") is not None and applicant_id == personal_record["fields"]["Applicant ID"]:
             personal_data = {
                 "name": personal_record["fields"]["Full Name"],
-                "location": personal_record["fields"]["Location"]
+                "location": personal_record["fields"]["Location"],
+                "email": personal_record["fields"]["Email"],
+                "linkedin": personal_record["fields"]["LinkedIn"],
             }
             break
 
@@ -57,13 +59,17 @@ def build_compressed_json(applicant_record, experience_records, personal_records
             experience_data.append({
                 "company": experience_record["fields"]["Company"],
                 "title": experience_record["fields"]["Title"],
+                "start": experience_record["fields"]["Start"],
+                "end": experience_record["fields"]["End"],
+                "technologies": experience_record["fields"]["Technologies"].split(","),
             })
     
     salary_data = {}
     for salary_record in salary_records:
         if salary_record.get("fields", {}).get("Applicant") is not None and applicant_id == salary_record["fields"]["Applicant ID"]:
             salary_data = {
-                "rate": salary_record["fields"]["Preferred Rate"],
+                "rate": int(salary_record["fields"]["Preferred Rate"]),
+                "min_rate": int(salary_record["fields"]["Minimum Rate"]),
                 "currency": salary_record["fields"]["Currency"],
                 "availability": int(salary_record["fields"]["Availability (hrs/wk)"]),
             }
@@ -165,6 +171,10 @@ def main():
         updated_applicant_record = deepcopy(applicant_record)
         updated_applicant_record["fields"]["Compressed JSON"] = json.dumps(applicant_compressed_json)
         final_applicants_records.append(updated_applicant_record)
+
+    with open("data/final_applicants_records.json", "w") as f:
+        json.dump(final_applicants_records, f, indent=4)
+        print(f"Saved {len(final_applicants_records)} final applicants records to data/final_applicants_records.json")
 
     # Sanitize records and upsert 10 records at a time
     sanitized_records = sanitize_json_records(final_applicants_records)
