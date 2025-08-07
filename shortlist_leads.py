@@ -131,9 +131,9 @@ def main():
             )
             final_shortlisted_leads.append(updated_shortlisted_lead_record)
 
-            # Create a new applicant record with shortlist status as "Selected"
+            # Create a new applicant record with shortlist status as "Processing"
             updated_applicant_record = deepcopy(applicant_record)
-            updated_applicant_record["fields"]["Shortlist Status"] = "Selected"
+            updated_applicant_record["fields"]["Shortlist Status"] = "Processing"
             final_applicants_records.append(updated_applicant_record)
 
         else:
