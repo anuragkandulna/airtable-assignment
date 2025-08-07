@@ -66,25 +66,6 @@ def main():
     print(f"Fetched {len(personal_records)} personal records")
     print(f"Fetched {len(salary_records)} salary records")
 
-    # # Save records to JSON files
-    # os.makedirs("data", exist_ok=True)
-
-    # with open("data/applicants.json", "w") as f:
-    #     json.dump(applicants_records, f, indent=4)
-    #     print(f"Saved {len(applicants_records)} applicants records to data/applicants.json")
-
-    # with open("data/experience.json", "w") as f:
-    #     json.dump(experience_records, f, indent=4)
-    #     print(f"Saved {len(experience_records)} experience records to data/experience.json")
-
-    # with open("data/personal.json", "w") as f:
-    #     json.dump(personal_records, f, indent=4)
-    #     print(f"Saved {len(personal_records)} personal records to data/personal.json")
-
-    # with open("data/salary.json", "w") as f:
-    #     json.dump(salary_records, f, indent=4)
-    #     print(f"Saved {len(salary_records)} salary records to data/salary.json")
-
     # Build compressed JSON for entire applicants records
     final_applicants_records = []
     for applicant_record in applicants_records:
@@ -109,6 +90,8 @@ def main():
             sanitized_records=sanitized_records[i:j]
         )
         i = j
+
+    print("Compressed JSON completed successfully!!!")
 
 
 if __name__ == "__main__":
