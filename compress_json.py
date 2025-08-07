@@ -1,5 +1,5 @@
 import json
-import os
+# import os
 from copy import deepcopy
 from utils.config_loader import TABLES   
 from utils.airtable_operations import fetch_records_from_table, sanitize_records, upsert_records
@@ -66,24 +66,24 @@ def main():
     print(f"Fetched {len(personal_records)} personal records")
     print(f"Fetched {len(salary_records)} salary records")
 
-    # Save records to JSON files
-    os.makedirs("data", exist_ok=True)
+    # # Save records to JSON files
+    # os.makedirs("data", exist_ok=True)
 
-    with open("data/applicants.json", "w") as f:
-        json.dump(applicants_records, f, indent=4)
-        print(f"Saved {len(applicants_records)} applicants records to data/applicants.json")
+    # with open("data/applicants.json", "w") as f:
+    #     json.dump(applicants_records, f, indent=4)
+    #     print(f"Saved {len(applicants_records)} applicants records to data/applicants.json")
 
-    with open("data/experience.json", "w") as f:
-        json.dump(experience_records, f, indent=4)
-        print(f"Saved {len(experience_records)} experience records to data/experience.json")
+    # with open("data/experience.json", "w") as f:
+    #     json.dump(experience_records, f, indent=4)
+    #     print(f"Saved {len(experience_records)} experience records to data/experience.json")
 
-    with open("data/personal.json", "w") as f:
-        json.dump(personal_records, f, indent=4)
-        print(f"Saved {len(personal_records)} personal records to data/personal.json")
+    # with open("data/personal.json", "w") as f:
+    #     json.dump(personal_records, f, indent=4)
+    #     print(f"Saved {len(personal_records)} personal records to data/personal.json")
 
-    with open("data/salary.json", "w") as f:
-        json.dump(salary_records, f, indent=4)
-        print(f"Saved {len(salary_records)} salary records to data/salary.json")
+    # with open("data/salary.json", "w") as f:
+    #     json.dump(salary_records, f, indent=4)
+    #     print(f"Saved {len(salary_records)} salary records to data/salary.json")
 
     # Build compressed JSON for entire applicants records
     final_applicants_records = []
