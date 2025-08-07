@@ -38,8 +38,8 @@ def create_work_experience_records(applicant_id, experience_data, work_experienc
                 "Applicant ID": applicant_id,
                 "Company": experience_data[i]["company"],
                 "Title": experience_data[i]["title"],
-                "Start date": experience_data[i]["start"],
-                "End date": experience_data[i]["end"],
+                "Start": experience_data[i]["start"],
+                "End": experience_data[i]["end"],
                 "Technologies": ",".join(experience_data[i]["technologies"])
             }
         }
@@ -116,7 +116,7 @@ def main():
             )
 
         else:
-            print(f"Skipping {applicant_id} because it doesn't have personal details")
+            print(f"Skipping Personal Details for Applicant ID: {applicant_id} because it doesn't have personal details")
         
         # Insert updated Work Experience records
         if compressed_json_data["experience"] and work_experience_references:
@@ -132,14 +132,14 @@ def main():
                 j = min(i + 10, len(work_experience_records))
                 print(f"Upserting {len(work_experience_records[i:j])} work experience records in batch from index {i} to {j}")
                 upsert_records(
-                table_id=TABLES["experience"],
-                table_name="Work Experience",
-                sanitized_records=work_experience_records[i:j]
-            )
-            i = j
+                    table_id=TABLES["experience"],
+                    table_name="Work Experience",
+                    sanitized_records=work_experience_records[i:j]
+                )
+                i = j
 
         else:
-            print(f"Skipping {applicant_id} because it doesn't have work experience")
+            print(f"Skipping Work Experience for Applicant ID: {applicant_id} because it doesn't have work experience")
 
         # Insert updated Salary Preferences record
         if compressed_json_data["salary"] and salary_preferences_reference:
@@ -158,9 +158,9 @@ def main():
             )
 
         else:
-            print(f"Skipping {applicant_id} because it doesn't have salary preferences")
+            print(f"Skipping Salary Preferences for Applicant ID: {applicant_id} because it doesn't have salary preferences")
 
-        print(f"Completed processing applicant {i+1} of {len(applicants_records)}: {applicant_record['fields']['Applicant ID']}\n")
+        print(f"Completed processing applicant {i+1} of {len(applicants_records)}: {applicant_record['fields']['Applicant ID']}")
 
 
 if __name__ == "__main__":
