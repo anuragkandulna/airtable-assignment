@@ -1,5 +1,4 @@
 import json
-# import os
 from copy import deepcopy
 from utils.config_loader import TABLES   
 from utils.airtable_operations import fetch_records_from_table, sanitize_records, upsert_records
@@ -73,10 +72,6 @@ def main():
         updated_applicant_record = deepcopy(applicant_record)
         updated_applicant_record["fields"]["Compressed JSON"] = json.dumps(applicant_compressed_json)
         final_applicants_records.append(updated_applicant_record)
-
-    with open("data/final_applicants_records.json", "w") as f:
-        json.dump(final_applicants_records, f, indent=4)
-        print(f"Saved {len(final_applicants_records)} final applicants records to data/final_applicants_records.json")
 
     # Sanitize records and upsert 10 records at a time
     sanitized_records = sanitize_records(final_applicants_records)
