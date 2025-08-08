@@ -49,17 +49,17 @@ def verify_shortlist_criteria(applicant_id, compressed_json):
         except Exception:
             continue
 
-    # Convert currency to USD
+    # Convert currency to USD for comparison
     currency = salary_preferences.get("currency", "")
     if currency == "EUR":
-        rate_in_usd = salary_preferences["rate"] * 1.15
-        min_rate_in_usd = salary_preferences["min_rate"] * 1.15
-    elif currency == "GBP":
-        rate_in_usd = salary_preferences["rate"] * 1.3
-        min_rate_in_usd = salary_preferences["min_rate"] * 1.3
+        rate_in_usd = round(salary_preferences["rate"] * 1.15, 2)
+    elif currency == "USD":
+        rate_in_usd = round(salary_preferences["rate"], 2)
     elif currency == "INR":
-        rate_in_usd = salary_preferences["rate"] * 0.012
-        min_rate_in_usd = salary_preferences["min_rate"] * 0.012
+        rate_in_usd = round(salary_preferences["rate"] * 0.012, 2)
+    else:
+        # Default to USD if currency is not recognized
+        rate_in_usd = round(salary_preferences["rate"], 2)
 
     # Verify if applicant meets all criteria
     meets_experience_criteria = is_from_tier1 or has_4_yoe
