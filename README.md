@@ -62,6 +62,10 @@ Condition: By default, Email is considered as Applicant ID to maintain consisten
 -   **LLM Summary** (Long text) – Generated summary from LLM.
 -   **LLM Score** (Number) – Candidate quality score (1–10) from LLM.
 -   **LLM Follow-Ups** (Long text) – Suggested follow-up questions from LLM.
+-   **Personal Details** (Linked record) - Link to _Personal Details_ table. (Autofilled by Airtable)
+-   **Work Experience** (Linked record) - Link to _Work Experience_ table. (Autofilled by Airtable)
+-   **Salary Preferences** (Linked record) - Link to _Salary Preferences_ table. (Autofilled by Airtable)
+-   **Shortlisted Leads** (Linked record) - Link to _Shortlisted Leads_ table. (Autofilled by Airtable)
 
 ---
 
