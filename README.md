@@ -4,17 +4,17 @@
 
 This Airtable base manages contractor application data using a multi-table design, automation workflows, and Python scripts for compression, decompression, lead shortlisting and LLM-based evaluation.
 
-**Github**: https://github.com/anuragkandulna/airtable-assignment
+-   **Github**: https://github.com/anuragkandulna/airtable-assignment
 
-**Airtable Base**: https://airtable.com/appKvwNAhloGjoITk/shrZLsLb602GaLQS5
+-   **Airtable Base**: https://airtable.com/appKvwNAhloGjoITk/shrZLsLb602GaLQS5
 
-**Personal Details Form**: https://airtable.com/appKvwNAhloGjoITk/pagT4Ko7zkwnzuG6w/form
-**Work Experience Form**: https://airtable.com/appKvwNAhloGjoITk/pagQbxAimK0F46trc/form
-**Salary Preferences Form**: https://airtable.com/appKvwNAhloGjoITk/pagrCaERoblFD6R2b/form
+-   **Personal Details Form**: https://airtable.com/appKvwNAhloGjoITk/pagT4Ko7zkwnzuG6w/form
+-   **Work Experience Form**: https://airtable.com/appKvwNAhloGjoITk/pagQbxAimK0F46trc/form
+-   **Salary Preferences Form**: https://airtable.com/appKvwNAhloGjoITk/pagrCaERoblFD6R2b/form
 
-**Applicant Automation for Personal Data Form**: https://airtable.com/appKvwNAhloGjoITk/wfl5KWdu46vbxOgUW
-**Applicant Automation for Work Experience Form**: https://airtable.com/appKvwNAhloGjoITk/wflSEvZEz7Y04En80
-**Applicant Automation for Salary Preferences Form**: https://airtable.com/appKvwNAhloGjoITk/wflvxGdoS9NsgkTIi
+-   **Applicant Automation for Personal Data Form**: https://airtable.com/appKvwNAhloGjoITk/wfl5KWdu46vbxOgUW
+-   **Applicant Automation for Work Experience Form**: https://airtable.com/appKvwNAhloGjoITk/wflSEvZEz7Y04En80
+-   **Applicant Automation for Salary Preferences Form**: https://airtable.com/appKvwNAhloGjoITk/wflvxGdoS9NsgkTIi
 
 ---
 
