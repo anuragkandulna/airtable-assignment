@@ -257,9 +257,8 @@ Filename: `utils/config_loader.py`
 
 ## Other Files
 
-### 1. Example environment file - `.env.example`
-
-### 2. Python requirements file - `requirements.txt`
+1. Example environment file - `.env.example`
+2. Python requirements file - `requirements.txt`
 
 ---
 
